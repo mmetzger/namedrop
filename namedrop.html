@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sender Information</title>
+    
+    <!-- Office JavaScript API -->
+    <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 100%;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .header h1 {
+            color: #0078d4;
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .sender-info {
+            background: #f8f9fa;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #0078d4;
+        }
+        
+        .info-row {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+        
+        .info-row:last-child {
+            margin-bottom: 0;
+        }
+        
+        .label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 5px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .value {
+            font-size: 16px;
+            color: #212529;
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+            word-break: break-all;
+        }
+        
+        .no-email {
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+            padding: 40px 20px;
+        }
+        
+        .refresh-btn {
+            background: #0078d4;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            width: 100%;
+            margin-top: 20px;
+            transition: background-color 0.2s;
+        }
+        
+        .refresh-btn:hover {
+            background: #106ebe;
+        }
+        
+        .refresh-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        .loading {
+            text-align: center;
+            color: #6c757d;
+            padding: 20px;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #dc3545;
+            margin-bottom: 20px;
+        }
+        
+        .icon {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📧 Sender Information</h1>
+        </div>
+        
+        <div id="content">
+            <div class="loading">
+                <p>Loading sender information...</p>
+            </div>
+        </div>
+        
+        <button id="refreshBtn" class="refresh-btn" onclick="loadSenderInfo()">
+            🔄 Refresh Sender Info
+        </button>
+    </div>
+
+    <script type="text/javascript">
+        Office.onReady((info) => {
+            if (info.host === Office.HostType.Outlook) {
+                loadSenderInfo();
+            }
+        });
+
+        function loadSenderInfo() {
+            const contentDiv = document.getElementById('content');
+            const refreshBtn = document.getElementById('refreshBtn');
+            
+            refreshBtn.disabled = true;
+            refreshBtn.textContent = '🔄 Loading...';
+            
+            contentDiv.innerHTML = '<div class="loading"><p>Loading sender information...</p></div>';
+
+            Office.context.mailbox.item.from.getAsync((result) => {
+                refreshBtn.disabled = false;
+                refreshBtn.innerHTML = '🔄 Refresh Sender Info';
+                
+                if (result.status === Office.AsyncResultStatus.Succeeded) {
+                    const fromData = result.value;
+                    displaySenderInfo(fromData);
+                } else {
+                    displayError('Failed to retrieve sender information: ' + result.error.message);
+                }
+            });
+        }
+
+        function displaySenderInfo(fromData) {
+            const contentDiv = document.getElementById('content');
+            
+            if (!fromData || fromData.length === 0) {
+                contentDiv.innerHTML = '<div class="no-email"><p>No sender information available for this item.</p></div>';
+                return;
+            }
+
+            // Get the first sender (primary sender)
+            const sender = fromData[0];
+            const displayName = sender.displayName || 'Unknown Sender';
+            const emailAddress = sender.emailAddress || 'No email address';
+            
+            contentDiv.innerHTML = `
+                <div class="sender-info">
+                    <div class="info-row">
+                        <div class="label">👤 Display Name</div>
+                        <div class="value">${escapeHtml(displayName)}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="label">📧 Email Address</div>
+                        <div class="value">${escapeHtml(emailAddress)}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function displayError(message) {
+            const contentDiv = document.getElementById('content');
+            contentDiv.innerHTML = `
+                <div class="error">
+                    <strong>Error:</strong> ${escapeHtml(message)}
+                </div>
+                <div class="no-email">
+                    <p>Please select an email message to view sender information.</p>
+                </div>
+            `;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Auto-refresh when item changes (if supported)
+        if (Office.context.mailbox.item && Office.context.mailbox.item.addHandlerAsync) {
+            Office.context.mailbox.item.addHandlerAsync(
+                Office.EventType.ItemChanged, 
+                loadSenderInfo
+            );
+        }
+    </script>
+</body>
+</html>
