@@ -21,8 +21,8 @@
   <Description DefaultValue="Reveals the actual sender name and email address for improved email security and clarity." />
 
   <!-- Icon for your add-in. Used on installation screens and the add-ins dialog. -->
-  <IconUrl DefaultValue="https://localhost:3000/assets/icon-32.png"/>
-  <HighResolutionIconUrl DefaultValue="https://localhost:3000/assets/icon-80.png"/>
+  <IconUrl DefaultValue="https://mmetzger.github.io/namedrop/assets/icon-32.png"/>
+  <HighResolutionIconUrl DefaultValue="https://mmetzger.github.io/namedrop/assets/icon-80.png"/>
 
   <!--If you plan to submit this add-in to the Office Store, uncomment the SupportUrl element below-->
   <SupportUrl DefaultValue="https://your-company.com/support" />
@@ -46,7 +46,7 @@
   <FormSettings>
     <Form xsi:type="ItemRead">
       <DesktopSettings>
-        <SourceLocation DefaultValue="https://localhost:3000/namedrop.html"/>
+        <SourceLocation DefaultValue="https://mmetzger.github.io/namedrop/namedrop.html"/>
         <RequestedHeight>250</RequestedHeight>
       </DesktopSettings>
     </Form>
@@ -103,13 +103,13 @@
 
     <Resources>
       <bt:Images>
-        <bt:Image id="Icon.16x16" DefaultValue="https://localhost:3000/assets/icon-16.png"/>
-        <bt:Image id="Icon.32x32" DefaultValue="https://localhost:3000/assets/icon-32.png"/>
-        <bt:Image id="Icon.80x80" DefaultValue="https://localhost:3000/assets/icon-80.png"/>
+        <bt:Image id="Icon.16x16" DefaultValue="https://mmetzger.github.io/namedrop/assets/icon-16.png"/>
+        <bt:Image id="Icon.32x32" DefaultValue="https://mmetzger.github.io/namedrop/assets/icon-32.png"/>
+        <bt:Image id="Icon.80x80" DefaultValue="https://mmetzger.github.io/namedrop/assets/icon-80.png"/>
       </bt:Images>
       <bt:Urls>
-        <bt:Url id="Commands.Url" DefaultValue="https://localhost:3000/commands.html" />
-        <bt:Url id="Taskpane.Url" DefaultValue="https://localhost:3000/namedrop.html" />
+        <bt:Url id="Commands.Url" DefaultValue="https://mmetzger.github.io/namedrop/commands.html" />
+        <bt:Url id="Taskpane.Url" DefaultValue="https://mmetzger.github.io/namedrop/namedrop.html" />
       </bt:Urls>
       <bt:ShortStrings>
         <bt:String id="GroupLabel" DefaultValue="NameDrop"/>
