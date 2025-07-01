@@ -151,8 +151,12 @@
 
     <script type="text/javascript">
         Office.onReady((info) => {
+            console.log('Office.onReady called', info);
             if (info.host === Office.HostType.Outlook) {
+                console.log('Outlook host detected');
                 loadSenderInfo();
+            } else {
+                displayError('This add-in only works in Outlook. Detected host: ' + info.host);
             }
         });
 
@@ -160,22 +164,61 @@
             const contentDiv = document.getElementById('content');
             const refreshBtn = document.getElementById('refreshBtn');
             
+            console.log('loadSenderInfo called');
             refreshBtn.disabled = true;
             refreshBtn.textContent = '🔄 Loading...';
             
             contentDiv.innerHTML = '<div class="loading"><p>Loading sender information...</p></div>';
 
-            Office.context.mailbox.item.from.getAsync((result) => {
+            // Check if we have a mailbox item
+            if (!Office.context || !Office.context.mailbox || !Office.context.mailbox.item) {
+                console.error('No mailbox item available');
                 refreshBtn.disabled = false;
                 refreshBtn.innerHTML = '🔄 Refresh Sender Info';
-                
-                if (result.status === Office.AsyncResultStatus.Succeeded) {
-                    const fromData = result.value;
-                    displaySenderInfo(fromData);
-                } else {
-                    displayError('Failed to retrieve sender information: ' + result.error.message);
-                }
-            });
+                displayError('No email item selected. Please open an email message first.');
+                return;
+            }
+
+            console.log('Mailbox item found, checking item type:', Office.context.mailbox.item.itemType);
+            
+            // Check if this is a message (not appointment, etc.)
+            if (Office.context.mailbox.item.itemType !== Office.MailboxEnums.ItemType.Message) {
+                refreshBtn.disabled = false;
+                refreshBtn.innerHTML = '🔄 Refresh Sender Info';
+                displayError('This add-in only works with email messages.');
+                return;
+            }
+
+            // Try different approaches for getting sender info
+            if (Office.context.mailbox.item.from && Office.context.mailbox.item.from.getAsync) {
+                console.log('Using from.getAsync method');
+                Office.context.mailbox.item.from.getAsync((result) => {
+                    console.log('from.getAsync result:', result);
+                    refreshBtn.disabled = false;
+                    refreshBtn.innerHTML = '🔄 Refresh Sender Info';
+                    
+                    if (result.status === Office.AsyncResultStatus.Succeeded) {
+                        const fromData = result.value;
+                        console.log('Sender data retrieved:', fromData);
+                        displaySenderInfo(fromData);
+                    } else {
+                        console.error('Error getting sender info:', result.error);
+                        displayError('Failed to retrieve sender information: ' + (result.error ? result.error.message : 'Unknown error'));
+                    }
+                });
+            } else if (Office.context.mailbox.item.sender) {
+                // Fallback for older API versions
+                console.log('Using direct sender property');
+                refreshBtn.disabled = false;
+                refreshBtn.innerHTML = '🔄 Refresh Sender Info';
+                const sender = Office.context.mailbox.item.sender;
+                displaySenderInfo([sender]);
+            } else {
+                console.error('No sender information available');
+                refreshBtn.disabled = false;
+                refreshBtn.innerHTML = '🔄 Refresh Sender Info';
+                displayError('Sender information is not available for this item.');
+            }
         }
 
         function displaySenderInfo(fromData) {
