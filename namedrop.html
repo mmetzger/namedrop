@@ -305,6 +305,7 @@
             const displayName = sender.displayName || 'Unknown Sender';
             const emailAddress = sender.emailAddress || 'No email address';
             const sendingDomain = emailAddress.split('@')[1] || 'Unknown Domain';
+            const replyTo = sender.replyTo || emailAddress;
             
             contentDiv.innerHTML = `
                 <div class="sender-info">
@@ -319,6 +320,10 @@
                     <div class="info-row">
                         <div class="label">🌐 Sending Domain</div>
                         <div class="value">${escapeHtml(sendingDomain)}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="label">🔗 Reply To</div>
+                        <div class="value" data-full-text="${escapeHtml(replyTo)}">${escapeHtml(replyTo)}</div>
                     </div>
                 </div>
             `;
