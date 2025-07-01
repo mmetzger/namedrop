@@ -233,6 +233,7 @@
             const sender = fromData[0];
             const displayName = sender.displayName || 'Unknown Sender';
             const emailAddress = sender.emailAddress || 'No email address';
+            const sendingDomain = emailAddress.split('@')[1] || 'Unknown Domain';
             
             contentDiv.innerHTML = `
                 <div class="sender-info">
@@ -243,6 +244,10 @@
                     <div class="info-row">
                         <div class="label">📧 Email Address</div>
                         <div class="value">${escapeHtml(emailAddress)}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="label">🌐 Sending Domain</div>
+                        <div class="value">${escapeHtml(sendingDomain)}</div>
                     </div>
                 </div>
             `;
