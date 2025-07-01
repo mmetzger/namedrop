@@ -67,26 +67,90 @@
             letter-spacing: 0.5px;
         }
         
-        .value {
-            font-size: 14px;
+        .value {  */
+            font-size: 14px;  
+            color: #212529;  
+            background: white;  
+            padding: 8px;  
+            border-radius: 4px;  
+            border: 1px solid #dee2e6;  
+            overflow: hidden;  
+            text-overflow: ellipsis;  
+            white-space: nowrap;  
+            cursor: pointer;  
+        }  
+/*  */
+/*        .value:hover {  */
+/*            overflow: visible;  */
+/*            white-space: normal;  */
+/*            z-index: 1000;  */
+/*            position: relative;  */
+/*        }  */
+        
+        .value.truncated {
+            font-size: 16px;
             color: #212529;
             background: white;
-            padding: 8px;
+            padding: 10px;
             border-radius: 4px;
             border: 1px solid #dee2e6;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
             cursor: pointer;
-        }
-
-        .value:hover {
-            overflow: visible;
-            white-space: normal;
-            z-index: 1000;
-            position: relative;
+            position: relative;             /* Required for tooltip positioning */
         }
         
+        /* Tooltip container */
+        .value.truncated::after {
+            content: attr(data-full-text);  /* Gets text from data attribute */
+            position: absolute;
+            bottom: 100%;                   /* Position above the element */
+            left: 50%;
+            transform: translateX(-50%);
+            background: #fffbcc;            /* Light yellow background */
+            color: #333;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #e6cc00;      /* Yellow border */
+            font-size: 14px;
+            white-space: normal;            /* Allow text wrapping in tooltip */
+            word-break: break-all;
+            max-width: 300px;               /* Limit tooltip width */
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            z-index: 1000;
+            opacity: 0;                     /* Hidden by default */
+            visibility: hidden;
+            transition: opacity 0.2s, visibility 0.2s;
+            pointer-events: none;           /* Don't interfere with mouse events */
+        }
+        
+        /* Show tooltip on hover */
+        .value.truncated:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* Tooltip arrow pointing down */
+        .value.truncated::before {
+            content: '';
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(1px);
+            border: 6px solid transparent;
+            border-top-color: #e6cc00;      /* Yellow arrow border */
+            z-index: 1001;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s, visibility 0.2s;
+        }
+        
+        .value.truncated:hover::before {
+            opacity: 1;
+            visibility: visible;
+        }
+
         .no-email {
             text-align: center;
             color: #6c757d;
@@ -253,7 +317,7 @@
                     </div>
                     <div class="info-row">
                         <div class="label">📧 Email Address</div>
-                        <div class="value">${escapeHtml(emailAddress)}</div>
+                        <div class="value truncated" data-full-text="${escapeHtml(emailAddress)}">${escapeHtml(emailAddress)}</div>
                     </div>
                     <div class="info-row">
                         <div class="label">🌐 Sending Domain</div>
